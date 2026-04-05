@@ -1,0 +1,169 @@
+﻿@model Group2Flight.Models.Flight
+
+@{
+    string title = ViewBag.Action + " Flight";
+    ViewData["Title"] = title;
+}
+
+<div class="gf-page">
+    <div class="gf-inner">
+
+        <div class="gf-topstrip">
+            <div class="gf-breadcrumb">Flight Management</div>
+            <div class="gf-tag">@ViewBag.Action</div>
+        </div>
+
+        <div class="gf-page-title">@title</div>
+        <div class="gf-page-sub">Fill in the details below to @ViewBag.Action.ToString().ToLower() the flight record</div>
+
+        <div asp-validation-summary="All" class="gf-val-summary text-danger"></div>
+
+        <form asp-action="Edit" method="post">
+
+            <div class="gf-ticket">
+
+                <!-- Route Section -->
+                <div class="gf-section-lbl">Flight Info</div>
+                <div class="gf-form-grid" style="margin-bottom:1rem;">
+                    <div class="gf-field full">
+                        <label class="gf-field-lbl">Flight Code</label>
+                        @if (ViewBag.Action == "Edit")
+                        {
+                            <input asp-for="FlightCode" class="gf-input" readonly />
+                        }
+                        else
+                        {
+                            <input asp-for="FlightCode" class="gf-input" />
+                        }
+                    </div>
+                    <div class="gf-field">
+                        <label asp-for="From" class="gf-field-lbl"></label>
+                        <select asp-for="From" class="gf-select">
+                            <option value="">-- Departure --</option>
+                            <option>Dubai</option>
+                            <option>Sydney</option>
+                            <option>Doha</option>
+                            <option>Paris</option>
+                            <option>Singapore</option>
+                            <option>Tokyo</option>
+                            <option>Frankfurt</option>
+                            <option>Mumbai</option>
+                            <option>Rio de Janeiro</option>
+                            <option>London</option>
+                            <option>Cape Town</option>
+                            <option>Miami</option>
+                            <option>Melbourne</option>
+                            <option>Munich</option>
+                            <option>Shanghai</option>
+                        </select>
+                    </div>
+                    <div class="gf-field">
+                        <label asp-for="To" class="gf-field-lbl"></label>
+                        <select asp-for="To" class="gf-select">
+                            <option value="">-- Destination --</option>
+                            <option>Dubai</option>
+                            <option>Sydney</option>
+                            <option>Doha</option>
+                            <option>Paris</option>
+                            <option>Singapore</option>
+                            <option>Tokyo</option>
+                            <option>Frankfurt</option>
+                            <option>Mumbai</option>
+                            <option>Rio de Janeiro</option>
+                            <option>London</option>
+                            <option>Cape Town</option>
+                            <option>Miami</option>
+                            <option>Melbourne</option>
+                            <option>Munich</option>
+                            <option>Shanghai</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="gf-tear">
+                    <div class="gf-tear-circle"></div>
+                    <div class="gf-tear-line"></div>
+                    <div class="gf-tear-circle"></div>
+                </div>
+
+                <!-- Schedule Section -->
+                <div class="gf-section-lbl" style="margin-top:1rem;">Schedule</div>
+                <div class="gf-form-grid" style="margin-bottom:1rem;">
+                    <div class="gf-field full">
+                        <label asp-for="Date" class="gf-field-lbl"></label>
+                        <input asp-for="Date" type="date" class="gf-input" />
+                    </div>
+                    <div class="gf-field">
+                        <label asp-for="DepartureTime" class="gf-field-lbl"></label>
+                        <input asp-for="DepartureTime" type="time" class="gf-input" />
+                    </div>
+                    <div class="gf-field">
+                        <label asp-for="ArrivalTime" class="gf-field-lbl"></label>
+                        <input asp-for="ArrivalTime" type="time" class="gf-input" />
+                    </div>
+                </div>
+
+                <div class="gf-tear">
+                    <div class="gf-tear-circle"></div>
+                    <div class="gf-tear-line"></div>
+                    <div class="gf-tear-circle"></div>
+                </div>
+
+                <!-- Aircraft & Pricing Section -->
+                <div class="gf-section-lbl" style="margin-top:1rem;">Aircraft & Pricing</div>
+                <div class="gf-form-grid">
+                    <div class="gf-field">
+                        <label asp-for="CabinType" class="gf-field-lbl"></label>
+                        <select asp-for="CabinType" class="gf-select">
+                            <option value="">-- Cabin Type --</option>
+                            <option>Basic Economy</option>
+                            <option>Economy</option>
+                            <option>Economy Plus</option>
+                            <option>Business</option>
+                        </select>
+                    </div>
+                    <div class="gf-field">
+                        <label asp-for="AircraftType" class="gf-field-lbl"></label>
+                        <select asp-for="AircraftType" class="gf-select">
+                            <option value="">-- Aircraft --</option>
+                            <option>Boeing 747-8</option>
+                            <option>Airbus A350-900</option>
+                            <option>Airbus A330</option>
+                            <option>Boeing 777-200LR</option>
+                            <option>Airbus A380</option>
+                            <option>Boeing 777-300ER</option>
+                            <option>Airbus A340</option>
+                            <option>Airbus A350</option>
+                            <option>Boeing 787 Dreamliner</option>
+                        </select>
+                    </div>
+                    <div class="gf-field">
+                        <label asp-for="Emission" class="gf-field-lbl"></label>
+                        <input asp-for="Emission" type="number" step="0.1" class="gf-input" />
+                    </div>
+                    <div class="gf-field">
+                        <label asp-for="Price" class="gf-field-lbl"></label>
+                        <input asp-for="Price" type="number" step="0.01" class="gf-input" />
+                    </div>
+                    <div class="gf-field full">
+                        <label asp-for="AirlineId" class="gf-field-lbl"></label>
+                        <select asp-for="AirlineId" asp-items="ViewBag.Airlines" class="gf-select">
+                            <option value="">-- Select Airline --</option>
+                        </select>
+                        <span asp-validation-for="AirlineId" class="gf-validation"></span>
+                    </div>
+                </div>
+
+            </div>
+
+            <input type="hidden" asp-for="FlightId" />
+
+            <div class="gf-bottom-bar">
+                <a asp-controller="Flights" asp-action="Index" class="gf-btn-back">← Cancel</a>
+                <button type="submit" class="gf-btn-save">Save Flight →</button>
+            </div>
+
+        </form>
+
+    </div>
+</div>

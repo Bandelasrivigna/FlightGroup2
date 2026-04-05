@@ -1,7 +1,5 @@
 ﻿@{
     Layout = "_Layout";
-    var session = new FlightSessions(Context.Session);
-    int? count = session.GetSelectedCount() ?? 0;
 }
 <header>
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
@@ -26,23 +24,10 @@
                         <a class="nav-link text-dark" asp-controller="Home" asp-action="Privacy">Privacy</a>
                     </li>
                 </ul>
-                 <ul class="navbar-nav ms-auto">
-                    <a asp-controller="Home" asp-action="SelectedFlights"
-                       class="text-white bg-black">
-                        @if (count.HasValue)
-                        {
-                            <h5 class="p-2">
-                                <span class="badge bg-light text-black">@count</span>
-                            </h5>
-                        }
-                    </a>
+                <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <a class="nav-item nav-link"
-                           asp-area="Admin" asp-controller="Users" asp-action="Index">Admin</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-item nav-link"
-                           asp-area="Airlines" asp-controller="Flights" asp-action="Index">Airlines</a>
+                           asp-area="" asp-controller="Home" asp-action="Index">ViewSite</a>
                     </li>
                 </ul>
             </div>

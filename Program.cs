@@ -1,7 +1,15 @@
+using Group2Flight.Models;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddMemoryCache();
+builder.Services.AddSession();
 
+builder.Services.AddControllersWithViews();
+builder.Services.AddDbContext<Group2FlightDatabaseContext>(options =>
+    options.UseSqlite(
+        builder.Configuration.GetConnectionString("Group2FlightDatabaseConn")));
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
@@ -12,7 +20,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
-
+app.UseSession();
 app.UseAuthorization();
 
 app.MapStaticAssets();

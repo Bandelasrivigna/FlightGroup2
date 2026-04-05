@@ -1,1 +1,79 @@
-﻿<h1>Airlines Dashboard</h1>
+﻿@model List<Group2Flight.Models.Flight>
+
+@{
+    ViewData["Title"] = "Flights";
+}
+
+<div class="gf-page">
+    <div class="gf-inner">
+
+        <div class="gf-topstrip">
+            <div class="gf-breadcrumb">Flight Management</div>
+            <div class="gf-tag">Flights Panel</div>
+        </div>
+
+        <div class="gf-page-title">All Flights</div>
+        <div class="gf-page-sub">Manage, edit, or remove flights from the system</div>
+
+        <div class="gf-action-bar">
+            <div class="gf-count-badge">@Model.Count flight(s) total</div>
+            <a asp-controller="Flights" asp-action="Add" class="gf-btn-add">+ Add New Flight</a>
+        </div>
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="gf-flight-table">
+                @foreach (var flight in Model)
+                {
+                    <div class="gf-row">
+                        <img src="~/images/@flight.Airline.ImageName" alt="@flight.Airline.ImageName" class="gf-row-img" />
+
+                        <div class="gf-row-body">
+                            <div class="gf-row-route">
+                                <span class="gf-row-iata">@flight.From</span>
+                                <span class="gf-row-arrow">✈</span>
+                                <span class="gf-row-iata">@flight.To</span>
+                            </div>
+                            <div class="gf-row-meta">
+                                <span class="gf-chip code">@flight.FlightCode</span>
+                                <span class="gf-chip">@flight.Date.ToString("yyyy-MM-dd")</span>
+                                <span class="gf-chip">@flight.DepartureTime.ToString(@"hh\:mm") → @flight.ArrivalTime.ToString(@"hh\:mm")</span>
+                                <span class="gf-chip amber">@flight.CabinType</span>
+                                <span class="gf-chip">@flight.AircraftType</span>
+                            </div>
+                        </div>
+
+                        <div class="gf-row-tear">
+                            <div class="gf-row-tear-line"></div>
+                        </div>
+
+                        <div class="gf-row-price">
+                            <div class="gf-row-price-lbl">Price</div>
+                            <div class="gf-row-price-val">$@flight.Price.ToString("F2")</div>
+                        </div>
+
+                        <div class="gf-row-tear">
+                            <div class="gf-row-tear-line"></div>
+                        </div>
+
+                        <div class="gf-row-actions">
+                            <a asp-controller="Flights" asp-action="Edit"
+                               asp-route-id="@flight.FlightId" class="gf-btn-edit">✎ Edit</a>
+                            <a asp-controller="Flights" asp-action="Delete"
+                               asp-route-id="@flight.FlightId" class="gf-btn-del">✕ Delete</a>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="gf-empty">
+                <div class="gf-empty-icon">✈</div>
+                <div class="gf-empty-title">No flights available</div>
+                <div class="gf-empty-sub">Add your first flight using the button above.</div>
+            </div>
+        }
+
+    </div>
+</div>

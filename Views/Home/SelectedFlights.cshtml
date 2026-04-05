@@ -1,0 +1,81 @@
+﻿@model Group2Flight.Models.FlightsViewModel
+@{
+    ViewData["Title"] = "My Flights";
+}
+<div class="gf-page">
+    <div class="gf-inner">
+
+        <div class="gf-topstrip">
+            <div class="gf-breadcrumb">My Bookings</div>
+            <div class="gf-tag">
+                @(Model.FlightSelection != null ? Model.FlightSelection.Count() : 0) Flight(s)
+            </div>
+        </div>
+
+        <div class="gf-page-title">My Flights</div>
+        <div class="gf-page-sub">Manage and review your selected flights below</div>
+
+        @if (Model.FlightSelection != null && Model.FlightSelection.Any())
+        {
+            <div class="gf-pass-list">
+                @foreach (var flightSel in Model.FlightSelection)
+                {
+                    <div class="gf-pass">
+                        <div class="gf-pass-strip"></div>
+                        <div class="gf-pass-body">
+
+                            <div class="gf-pass-route">
+                                <span class="gf-pass-iata">@flightSel.Flight.From</span>
+                                <span class="gf-pass-arrow">✈</span>
+                                <span class="gf-pass-iata">@flightSel.Flight.To</span>
+                            </div>
+
+                            <div class="gf-pass-meta">
+                                <div class="gf-pass-code">@flightSel.Flight.FlightCode</div>
+                                <div class="gf-pass-chips">
+                                    <span class="gf-chip amber">@flightSel.Flight.CabinType</span>
+                                    <span class="gf-chip">@flightSel.Flight.AircraftType</span>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="gf-pass-tear">
+                            <div class="gf-pass-tear-line"></div>
+                        </div>
+
+                        <div class="gf-pass-action">
+                            <form asp-action="CancelSelectedFlights" method="post">
+                                <input type="hidden" name="id" value="@flightSel.FlightSelectionId" />
+                                <button type="submit" class="gf-btn-cancel">✕ Cancel</button>
+                            </form>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="gf-empty">
+                <div class="gf-empty-icon">✈</div>
+                <div class="gf-empty-title">No flights selected</div>
+                <div class="gf-empty-sub">You have no booked flights yet. Head back to browse available routes.</div>
+            </div>
+        }
+
+        <div class="gf-bottom-bar">
+            <form asp-action="DeleteAllSelections" method="post">
+                <button type="submit" class="gf-btn-delete">⊗ Delete All</button>
+            </form>
+
+            <a asp-action="Index"
+               asp-route-activeFromKey="@Model.ActiveFromKey"
+               asp-route-activeToKey="@Model.ActiveToKey"
+               asp-route-activeDepartureDate="@Model.ActiveDepartureDate"
+               asp-route-activeCabinType="@Model.ActiveCabinType"
+               class="gf-btn-back">← Back to Home</a>
+        </div>
+
+    </div>
+</div>
+

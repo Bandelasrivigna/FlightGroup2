@@ -1,8 +1,135 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿@model Group2Flight.Models.FlightsViewModel
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+@{
+    ViewData["Title"] = "Home";
+}
+<div class="gf-page">
+    <div class="gf-inner">
+
+        <div class="gf-topstrip">
+            <div class="gf-breadcrumb">All Flights</div>
+            <div class="gf-tag">Live Schedule</div>
+        </div>
+
+        <div class="gf-page-title">Find Your Flight</div>
+        <div class="gf-page-sub">Browse and filter available routes below</div>
+
+        <div class="gf-layout">
+
+            <!-- Filter Sidebar -->
+            <div>
+                <div class="gf-filter-panel">
+                    <div class="gf-filter-title">Filter Flights</div>
+
+                    <form method="post" asp-action="Index">
+
+                        <div class="gf-field">
+                            <label class="gf-field-lbl">Cabin Type</label>
+                            <select name="activeCabinType" class="gf-select">
+                                <option value="all" class="@Model.CheckActiveCabinType("all")">All Cabins</option>
+                                @foreach (var cabin in Model.CabinTypes)
+                                {
+                                    if (Model.ActiveCabinType == cabin)
+                                    {
+                                        <option value="@cabin" selected="true" class="@Model.CheckActiveCabinType(cabin.ToString())">@cabin</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@cabin" class="@Model.CheckActiveCabinType(cabin.ToString())">@cabin</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <div class="gf-field">
+                            <label class="gf-field-lbl">From</label>
+                            <select name="activeFromKey" class="gf-select">
+                                <option value="all" class="@Model.CheckActiveFrom("all")">All Departure</option>
+                                @foreach (var from in Model.FromCities)
+                                {
+                                    <option value="@from" selected="@(Model.ActiveFromKey == from)">
+                                        @from
+                                    </option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="gf-field">
+                            <label class="gf-field-lbl">To</label>
+                            <select name="activeToKey" class="gf-select">
+                                <option value="all" class="@Model.CheckActiveTo("all")">All Destinations</option>
+                                @foreach (var to in Model.ToCities)
+                                {
+                                    <option value="@to" selected="@(Model.ActiveToKey == to)">
+                                        @to
+                                    </option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="gf-field">
+                            <label class="gf-field-lbl">Departure Date</label>
+                            <input type="date"
+                                   id="ActiveDepartureDate"
+                                   class="gf-input"
+                                   asp-for="ActiveDepartureDate"
+                                   name="ActiveDepartureDate"
+                                   autocomplete="off" />
+                        </div>
+
+                        <div class="gf-tear">
+                            <div class="gf-tear-circle"></div>
+                            <div class="gf-tear-line"></div>
+                            <div class="gf-tear-circle"></div>
+                        </div>
+
+                        <button type="submit" class="gf-btn-apply">Apply Filters →</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Flight Cards -->
+            <div class="gf-cards-grid">
+                @if (Model.Flight != null && Model.Flight.Any())
+                {
+                    @foreach (var flight in Model.Flight)
+                    {
+                        var dur = flight.ArrivalTime - flight.DepartureTime;
+                        if (dur.TotalMinutes < 0) { dur = dur.Add(TimeSpan.FromHours(24)); }
+                        <div class="gf-flight-card">
+                            <img src="~/images/@flight.Airline.ImageName" class="gf-card-img" alt="@flight.Airline.ImageName" />
+                            <div class="gf-card-body">
+                                <div class="gf-card-route">
+                                    <span class="gf-card-iata">@flight.From</span>
+                                    <span class="gf-card-arrow">✈</span>
+                                    <span class="gf-card-iata">@flight.To</span>
+                                </div>
+                                <div class="gf-card-time">
+                                    @flight.DepartureTime &nbsp;→&nbsp; @flight.ArrivalTime
+                                </div>
+                                <div class="gf-card-stub">
+                                    <span class="gf-stub-chip">@dur.ToString(@"hh\:mm")</span>
+                                    <span class="gf-stub-chip">@flight.Emission</span>
+                                    <span class="gf-stub-chip amber">@flight.CabinType</span>
+                                </div>
+                                <div class="gf-card-bottom">
+                                    <div class="gf-card-price">@flight.Price</div>
+                                    <a asp-action="Details" asp-route-id="@flight.FlightId" class="gf-btn-view">View →</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="gf-empty">
+                        <div class="gf-empty-icon">✈</div>
+                        <div class="gf-empty-title">No flights found</div>
+                        <div class="gf-empty-sub">Try adjusting your filters to see more results.</div>
+                    </div>
+                }
+            </div>
+
+        </div>
+    </div>
 </div>

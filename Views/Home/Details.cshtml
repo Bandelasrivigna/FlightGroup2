@@ -1,0 +1,120 @@
+﻿@model Group2Flight.Models.FlightsViewModel
+@{
+    ViewData["Title"] = "Flight Details";
+}
+
+<div class="gf-page">
+    <div class="gf-inner">
+
+        <div class="gf-topstrip">
+            <div class="gf-breadcrumb">Flight Details</div>
+            <div class="gf-tag">Confirmed</div>
+        </div>
+
+        <div class="gf-ticket">
+            <div class="gf-ticket-top">
+                <div>
+                    <div class="gf-flight-num">@Model.Flights.FlightCode</div>
+                    <div class="gf-status-dot">
+                        <div class="gf-dot-live"></div>
+                        <span class="gf-status-txt">Scheduled</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="gf-flight-date">@Model.Flights.Date</div>
+                </div>
+            </div>
+
+            <div class="gf-route">
+                <div class="gf-airport">
+                    <div class="gf-iata">@Model.Flights.From</div>
+                    <div class="gf-airport-label">Departure</div>
+                    <div class="gf-route-time">@Model.Flights.DepartureTime</div>
+                </div>
+
+                <div class="gf-route-center">
+                    <div class="gf-arc-line">
+                        <svg viewBox="0 0 100 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M 4 26 Q 50 2 96 26" stroke="rgba(240,160,60,0.5)" stroke-width="1.2" stroke-dasharray="3 3" />
+                            <text x="50" y="14" text-anchor="middle" font-size="12" fill="#f0a03c" font-family="monospace">✈</text>
+                        </svg>
+                    </div>
+                    <div class="gf-dur-badge">
+                        @{
+                            var duration = Model.Flights.ArrivalTime - Model.Flights.DepartureTime;
+                            if (duration.TotalMinutes < 0)
+                            {
+                                duration = duration.Add(TimeSpan.FromHours(24));
+                            }
+                        }
+                        @duration.ToString(@"hh\:mm")
+                    </div>
+                </div>
+
+                <div class="gf-airport right">
+                    <div class="gf-iata">@Model.Flights.To</div>
+                    <div class="gf-airport-label">Arrival</div>
+                    <div class="gf-route-time">@Model.Flights.ArrivalTime</div>
+                </div>
+            </div>
+
+            <div class="gf-tear">
+                <div class="gf-tear-circle"></div>
+                <div class="gf-tear-line"></div>
+                <div class="gf-tear-circle"></div>
+            </div>
+
+            <div class="gf-stub">
+                <div class="gf-stub-item">
+                    <div class="gf-stub-lbl">Cabin</div>
+                    <div class="gf-stub-val hi">@Model.Flights.CabinType</div>
+                </div>
+                <div class="gf-stub-item">
+                    <div class="gf-stub-lbl">Aircraft</div>
+                    <div class="gf-stub-val">@Model.Flights.AircraftType</div>
+                </div>
+                <div class="gf-stub-item">
+                    <div class="gf-stub-lbl">Duration</div>
+                    <div class="gf-stub-val">@duration.ToString(@"hh\:mm")</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="gf-cards">
+            <div class="gf-card">
+                <div class="gf-card-lbl">Departure</div>
+                <div class="gf-card-val">@Model.Flights.DepartureTime</div>
+            </div>
+            <div class="gf-card">
+                <div class="gf-card-lbl">Arrival</div>
+                <div class="gf-card-val green">@Model.Flights.ArrivalTime</div>
+            </div>
+            <div class="gf-card full">
+                <div class="gf-card-lbl">Carbon Emission</div>
+                <div class="gf-em-row">
+                    <div class="gf-em-track"><div class="gf-em-fill"></div></div>
+                    <div class="gf-em-val">@Model.Flights.Emission</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="gf-price-bar">
+            <div class="gf-price-left">
+                <div class="gf-price-lbl">Total Price</div>
+                <div class="gf-price-note">Per person · incl. taxes</div>
+            </div>
+            <div class="gf-price-amount">@Model.Flights.Price</div>
+        </div>
+
+        <div class="gf-actions">
+            <a asp-action="Index"
+               asp-route-activeFromKey="@Model.ActiveFromKey"
+               asp-route-activeToKey="@Model.ActiveToKey"
+               asp-route-activeDepartureDate="@Model.ActiveDepartureDate"
+               asp-route-activeCabinType="@Model.ActiveCabinType"
+               class="gf-btn-back">← Back</a>
+            <a asp-action="AddSelectedFlights" asp-route-id="@Model.Flights.FlightId" class="gf-btn-book">Select</a>
+        </div>
+
+    </div>
+</div>

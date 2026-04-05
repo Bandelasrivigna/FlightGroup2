@@ -1,0 +1,82 @@
+﻿@model Group2Flight.Models.Flight
+@{
+    ViewData["Title"] = "Delete Flight";
+}
+
+<div class="gf-page">
+    <div class="gf-inner">
+
+        <div class="gf-topstrip">
+            <div class="gf-breadcrumb">Flight Management</div>
+            <div class="gf-tag-danger">Irreversible</div>
+        </div>
+
+        <div class="gf-page-title">Confirm Deletion</div>
+        <div class="gf-page-sub">This flight will be permanently removed from the system</div>
+
+        <!-- Voided ticket -->
+        <div class="gf-ticket">
+            <div class="gf-void-stamp">VOID</div>
+
+            <div class="gf-ticket-top">
+                <div>
+                    <div class="gf-flight-num">@Model.FlightCode</div>
+                    <div class="gf-status-dot">
+                        <div class="gf-dot-red"></div>
+                        <span class="gf-status-txt">Pending Deletion</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="gf-route">
+                <span class="gf-iata">@Model.From</span>
+                <span class="gf-route-arrow">✈</span>
+                <span class="gf-iata">@Model.To</span>
+            </div>
+
+            <div class="gf-tear">
+                <div class="gf-tear-circle"></div>
+                <div class="gf-tear-line"></div>
+                <div class="gf-tear-circle"></div>
+            </div>
+
+            <div class="gf-stub">
+                <div>
+                    <div class="gf-stub-lbl">Cabin Type</div>
+                    <div class="gf-stub-val">@Model.CabinType</div>
+                </div>
+                <div>
+                    <div class="gf-stub-lbl">Aircraft</div>
+                    <div class="gf-stub-val">@Model.AircraftType</div>
+                </div>
+                <div>
+                    <div class="gf-stub-lbl">Departure</div>
+                    <div class="gf-stub-val">@Model.DepartureTime</div>
+                </div>
+                <div>
+                    <div class="gf-stub-lbl">Arrival</div>
+                    <div class="gf-stub-val">@Model.ArrivalTime</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Warning notice -->
+        <div class="gf-warning">
+            <span class="gf-warning-icon">⚠</span>
+            <div class="gf-warning-text">
+                Deleting this flight cannot be undone. All associated bookings and selections will also be removed.
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <form asp-action="Delete" method="post">
+            <input type="hidden" asp-for="FlightId" />
+            <div class="gf-bottom-bar">
+                <a asp-controller="Flights" asp-action="Index" class="gf-btn-back">← Cancel</a>
+                <button type="submit" class="gf-btn-delete">Delete Flight</button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
