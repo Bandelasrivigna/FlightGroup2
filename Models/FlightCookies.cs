@@ -32,7 +32,7 @@
             string idsString = string.Join(Delimiter, ids);
             CookieOptions options = new CookieOptions
             {
-                Expires = DateTime.Now.AddDays(30),
+                Expires = DateTime.Now.AddDays(12),
                 IsEssential = true
             };
 

@@ -7,15 +7,20 @@ namespace Group2Flight.Models
         public static void SetObject<T>(this ISession session,
             string key, T value)
         {
-            var valuse = JsonSerializer.Serialize(value);
-            session.SetString(key, valuse);
+            session.SetString(key, JsonSerializer.Serialize(value));
         }
 
         public static T? GetObject<T>(this ISession session, string key)
         {
-            var value = session.GetString(key);
-            return (string.IsNullOrEmpty(value)) ? default(T) :
-                JsonSerializer.Deserialize<T>(value);
+            var json = session.GetString(key);
+            if (string.IsNullOrEmpty(json))
+            {
+                return default(T);
+            }
+            else 
+            { 
+                return JsonSerializer.Deserialize<T>(json);
+            }
         }
     }
 }
