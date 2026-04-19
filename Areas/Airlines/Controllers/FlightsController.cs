@@ -49,6 +49,14 @@ namespace Group2Flight.Areas.Airlines.Controllers
         [HttpPost]
         public IActionResult Edit(Flight flight)
         {
+            if (TempData["okFlightDate"] == null)
+            {
+                string msg = Check.FlightCodeDateExists(context, flight.Date, flight.FlightCode);
+                if (!String.IsNullOrEmpty(msg))
+                {
+                    ModelState.AddModelError(nameof(flight.FlightCode), msg);
+                }
+            }
             if (ModelState.IsValid)
             {
                 if (flight.FlightId == 0)

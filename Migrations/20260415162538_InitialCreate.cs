@@ -34,8 +34,8 @@ namespace Group2Flight.Migrations
                     FlightId = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     FlightCode = table.Column<string>(type: "TEXT", nullable: false),
-                    From = table.Column<string>(type: "TEXT", nullable: false),
-                    To = table.Column<string>(type: "TEXT", nullable: false),
+                    From = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
+                    To = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
                     Date = table.Column<DateTime>(type: "TEXT", nullable: false),
                     DepartureTime = table.Column<TimeSpan>(type: "TEXT", nullable: false),
                     ArrivalTime = table.Column<TimeSpan>(type: "TEXT", nullable: false),

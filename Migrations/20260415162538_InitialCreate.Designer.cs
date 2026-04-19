@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Group2Flight.Migrations
 {
     [DbContext(typeof(Group2FlightDatabaseContext))]
-    [Migration("20260405213047_InitialCreate")]
+    [Migration("20260415162538_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -112,6 +112,7 @@ namespace Group2Flight.Migrations
 
                     b.Property<string>("From")
                         .IsRequired()
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Price")
@@ -119,6 +120,7 @@ namespace Group2Flight.Migrations
 
                     b.Property<string>("To")
                         .IsRequired()
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.HasKey("FlightId");

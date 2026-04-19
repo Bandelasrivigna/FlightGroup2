@@ -109,6 +109,7 @@ namespace Group2Flight.Migrations
 
                     b.Property<string>("From")
                         .IsRequired()
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Price")
@@ -116,6 +117,7 @@ namespace Group2Flight.Migrations
 
                     b.Property<string>("To")
                         .IsRequired()
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.HasKey("FlightId");

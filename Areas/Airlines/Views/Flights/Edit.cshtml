@@ -16,7 +16,6 @@
         <div class="gf-page-title">@title</div>
         <div class="gf-page-sub">Fill in the details below to @ViewBag.Action.ToString().ToLower() the flight record</div>
 
-        <div asp-validation-summary="All" class="gf-val-summary text-danger"></div>
 
         <form asp-action="Edit" method="post">
 
@@ -30,53 +29,23 @@
                         @if (ViewBag.Action == "Edit")
                         {
                             <input asp-for="FlightCode" class="gf-input" readonly />
+                            <span asp-validation-for="FlightCode" class="text-danger"></span>
                         }
                         else
                         {
                             <input asp-for="FlightCode" class="gf-input" />
+                            <span asp-validation-for="FlightCode" class="text-danger"></span>
                         }
                     </div>
                     <div class="gf-field">
                         <label asp-for="From" class="gf-field-lbl"></label>
-                        <select asp-for="From" class="gf-select">
-                            <option value="">-- Departure --</option>
-                            <option>Dubai</option>
-                            <option>Sydney</option>
-                            <option>Doha</option>
-                            <option>Paris</option>
-                            <option>Singapore</option>
-                            <option>Tokyo</option>
-                            <option>Frankfurt</option>
-                            <option>Mumbai</option>
-                            <option>Rio de Janeiro</option>
-                            <option>London</option>
-                            <option>Cape Town</option>
-                            <option>Miami</option>
-                            <option>Melbourne</option>
-                            <option>Munich</option>
-                            <option>Shanghai</option>
-                        </select>
+                        <input asp-for="From" type="text" class="gf-input" />
+                        <span asp-validation-for="From" class="text-danger"></span>
                     </div>
                     <div class="gf-field">
                         <label asp-for="To" class="gf-field-lbl"></label>
-                        <select asp-for="To" class="gf-select">
-                            <option value="">-- Destination --</option>
-                            <option>Dubai</option>
-                            <option>Sydney</option>
-                            <option>Doha</option>
-                            <option>Paris</option>
-                            <option>Singapore</option>
-                            <option>Tokyo</option>
-                            <option>Frankfurt</option>
-                            <option>Mumbai</option>
-                            <option>Rio de Janeiro</option>
-                            <option>London</option>
-                            <option>Cape Town</option>
-                            <option>Miami</option>
-                            <option>Melbourne</option>
-                            <option>Munich</option>
-                            <option>Shanghai</option>
-                        </select>
+                        <input asp-for="To" type="text" class="gf-input" />
+                        <span asp-validation-for="To" class="text-danger"></span>
                     </div>
                 </div>
 
@@ -92,14 +61,17 @@
                     <div class="gf-field full">
                         <label asp-for="Date" class="gf-field-lbl"></label>
                         <input asp-for="Date" type="date" class="gf-input" />
+                        <span asp-validation-for="Date" class="text-danger"></span>
                     </div>
                     <div class="gf-field">
                         <label asp-for="DepartureTime" class="gf-field-lbl"></label>
                         <input asp-for="DepartureTime" type="time" class="gf-input" />
+                        <span asp-validation-for="DepartureTime" class="text-danger"></span>
                     </div>
                     <div class="gf-field">
                         <label asp-for="ArrivalTime" class="gf-field-lbl"></label>
                         <input asp-for="ArrivalTime" type="time" class="gf-input" />
+                        <span asp-validation-for="ArrivalTime" class="text-danger"></span>
                     </div>
                 </div>
 
@@ -121,6 +93,7 @@
                             <option>Economy Plus</option>
                             <option>Business</option>
                         </select>
+                        <span asp-validation-for="CabinType" class="text-danger"></span>
                     </div>
                     <div class="gf-field">
                         <label asp-for="AircraftType" class="gf-field-lbl"></label>
@@ -136,17 +109,20 @@
                             <option>Airbus A350</option>
                             <option>Boeing 787 Dreamliner</option>
                         </select>
+                        <span asp-validation-for="AircraftType" class="text-danger"></span>
                     </div>
                     <div class="gf-field">
                         <label asp-for="Emission" class="gf-field-lbl"></label>
                         <input asp-for="Emission" type="number" step="0.1" class="gf-input" />
+                        <span asp-validation-for="Emission" class="text-danger"></span>
                     </div>
                     <div class="gf-field">
                         <label asp-for="Price" class="gf-field-lbl"></label>
                         <input asp-for="Price" type="number" step="0.01" class="gf-input" />
+                        <span asp-validation-for="Price" class="text-danger"></span>
                     </div>
                     <div class="gf-field full">
-                        <label asp-for="AirlineId" class="gf-field-lbl"></label>
+                        <label asp-for="Airline" class="gf-field-lbl"></label>
                         <select asp-for="AirlineId" asp-items="ViewBag.Airlines" class="gf-select">
                             <option value="">-- Select Airline --</option>
                         </select>
