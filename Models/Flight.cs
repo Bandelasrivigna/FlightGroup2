@@ -28,11 +28,11 @@ namespace Group2Flight.Models
         public DateTime Date { get; set; }
 
         [Required(ErrorMessage = "Please enter a DepartureTime.")]
-        [RegularExpression(@"^([01]\d|2[0-3]):([0-5]\d)$", ErrorMessage = "Enter time in HH:mm format (00:00 to 23:59).")]
+        //[RegularExpression(@"^([01]\d|2[0-3]):([0-5]\d)$", ErrorMessage = "Enter time in HH:mm format (00:00 to 23:59).")]
         public TimeSpan DepartureTime { get; set; }
 
         [Required(ErrorMessage = "Please enter a ArrivalTime.")]
-        [RegularExpression(@"^([01]\d|2[0-3]):([0-5]\d)$", ErrorMessage = "Enter time in HH:mm format (00:00 to 23:59).")]
+        //[RegularExpression(@"^([01]\d|2[0-3]):([0-5]\d)$", ErrorMessage = "Enter time in HH:mm format (00:00 to 23:59).")]
         public TimeSpan ArrivalTime { get; set; }
 
         [Required(ErrorMessage = "Please enter a CabinType.")]
