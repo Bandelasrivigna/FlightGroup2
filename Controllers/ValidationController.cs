@@ -1,4 +1,5 @@
-﻿using Group2Flight.Models;
+﻿using Group2Flight.Models.DataLayer;
+using Group2Flight.Models.Validations;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Group2Flight.Controllers

@@ -1,67 +1,207 @@
 using Group2Flight.Models;
+using Group2Flight.Models.DataLayer;
+using Group2Flight.Models.DomainModels;
+using Group2Flight.Models.ViewModels;
+using Group2Flight.Models.ExtensionMethods;
+using Group2Flight.Models.Utils;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 
 namespace Group2Flight.Controllers
 {
-	public class HomeController : Controller
-	{
-        private Group2FlightDatabaseContext _ctx;
-        public HomeController(Group2FlightDatabaseContext ctx)
+    public class HomeController : Controller
+    {
+        private readonly IRepository<Flight> flightRepo;
+        private readonly IRepository<FlightSelection> selectionRepo;
+
+        public HomeController(
+            IRepository<Flight> flightRepo,
+            IRepository<FlightSelection> selectionRepo)
         {
-            _ctx = ctx;
+            this.flightRepo = flightRepo;
+            this.selectionRepo = selectionRepo;
         }
+
         public ViewResult Index(FlightsViewModel model)
         {
-            var filter = new Filter($"{model.ActiveFromKey}-{model.ActiveToKey}-{DateTime.TryParse(model.ActiveDepartureDate, out DateTime activeDepartureDate)}-{model.ActiveCabinType}");
+            var filter = new Filter(
+                $"{model.ActiveFromKey}-{model.ActiveToKey}-" +
+                $"{DateTime.TryParse(model.ActiveDepartureDate, out DateTime activeDepartureDate)}-" +
+                $"{model.ActiveCabinType}");
+
             var filters = new Filter(filter.FilterString);
 
             var session = new FlightSessions(HttpContext.Session);
             var cookies = new FlightCookies(Request.Cookies, Response.Cookies);
+
+            // Save active filters
             session.SetActiveFrom(model.ActiveFromKey);
             session.SetActiveTo(model.ActiveToKey);
             session.SetActiveDepartureDate(model.ActiveDepartureDate);
             session.SetActiveCabinType(model.ActiveCabinType);
 
-            if (session.GetSelectedCount() == 0)
-            {
-                var ids = cookies.GetSelectedIds();
-                if (ids.Length > 0)
-                {
-                    var selectedFlights = _ctx.FlightSelection
-                        .Include(r => r.Flight)
-                        .ThenInclude(r => r.Airline)
-                        .Where(r => ids.Contains(r.FlightSelectionId.ToString()))
-                        .ToList();
+            // FIXED: Always sync session count from cookies on first load
+            var ids = cookies.GetSelectedIds();
 
-                    session.SetSelections(selectedFlights);
-                }
+            if (ids.Length > 0)
+            {
+                var selectedFlights = ids.Select(id => new FlightSelection
+                {
+                    FlightSelectionId = int.Parse(id),
+                    FlightId = int.Parse(id)
+                }).ToList();
+
+                session.SetSelections(selectedFlights);
             }
-            IQueryable<Flight> query = _ctx.Flight
-                .Include(r => r.Airline)
-                .OrderBy(r => r.FlightCode);
+            else
+            {
+                session.SetSelections(new List<FlightSelection>());
+            }
+
+            var options = new QueryOptions<Flight>
+            {
+                Includes = "Airline"
+            };
+
+            var flights = flightRepo.List(options)
+                .OrderBy(f => f.FlightCode)
+                .ToList();
 
             if (filters.HasFromKey)
-                query = query.Where(r => r.From.ToString() == model.ActiveFromKey);
+                flights = flights
+                    .Where(f => f.From == model.ActiveFromKey)
+                    .ToList();
 
             if (filters.HasToKey)
-                query = query.Where(r => r.To.ToString() == model.ActiveToKey);
-            
+                flights = flights
+                    .Where(f => f.To == model.ActiveToKey)
+                    .ToList();
+
             if (filters.HasCabinType)
-                query = query.Where(r => r.CabinType.ToString() == model.ActiveCabinType);
+                flights = flights
+                    .Where(f => f.CabinType == model.ActiveCabinType)
+                    .ToList();
 
-            if (!string.IsNullOrEmpty(model.ActiveDepartureDate) && model.ActiveDepartureDate.ToLower() != "all")
+            if (!string.IsNullOrEmpty(model.ActiveDepartureDate) &&
+                model.ActiveDepartureDate.ToLower() != "all")
             {
-                DateTime selectedDate = DateTime.Parse(model.ActiveDepartureDate);
+                DateTime selectedDate =
+                    DateTime.Parse(model.ActiveDepartureDate);
 
-                query = query.Where(r => r.Date.Date == selectedDate.Date);
+                flights = flights
+                    .Where(f => f.Date.Date == selectedDate.Date)
+                    .ToList();
             }
-            model.CabinTypes = _ctx.Flight.Select(f => f.CabinType).Distinct().ToList();
-            model.FromCities = _ctx.Flight.Select(f => f.From).Distinct().ToList();
-            model.ToCities = _ctx.Flight.Select(f => f.To).Distinct().ToList();
-            model.Flight = query.ToList();
+
+            model.CabinTypes = flightRepo.List(new QueryOptions<Flight>())
+                .Select(f => f.CabinType)
+                .Distinct()
+                .ToList();
+
+            model.FromCities = flightRepo.List(new QueryOptions<Flight>())
+                .Select(f => f.From)
+                .Distinct()
+                .ToList();
+
+            model.ToCities = flightRepo.List(new QueryOptions<Flight>())
+                .Select(f => f.To)
+                .Distinct()
+                .ToList();
+
+            model.Flight = flights;
+
             return View(model);
+        }
+        [HttpPost]
+        public IActionResult ReserveAllFlights()
+        {
+            var session = new FlightSessions(HttpContext.Session);
+            var cookies = new FlightCookies(Request.Cookies, Response.Cookies);
+
+            var selections = session.GetSelections();
+
+            // If session empty, restore from cookies
+            if (selections == null || !selections.Any())
+            {
+                var ids = cookies.GetSelectedIds();
+
+                selections = ids.Select(id => new FlightSelection
+                {
+                    FlightSelectionId = int.Parse(id),
+                    FlightId = int.Parse(id)
+                }).ToList();
+            }
+
+            if (selections == null || !selections.Any())
+            {
+                TempData["Message"] = "No selected flights available.";
+                return RedirectToAction("SelectedFlights");
+            }
+
+            foreach (var item in selections)
+            {
+                bool alreadyReserved = selectionRepo
+                    .List(new QueryOptions<FlightSelection>())
+                    .Any(r => r.FlightId == item.FlightId);
+
+                if (!alreadyReserved)
+                {
+                    selectionRepo.Insert(new FlightSelection
+                    {
+                        FlightId = item.FlightId
+                    });
+                }
+            }
+
+            selectionRepo.Save();
+
+            // Clear session + cookies after reserve
+            session.RemoveSelections();
+            cookies.RemoveSelectedIds();
+
+            TempData["Message"] = "All selected flights reserved successfully!";
+
+            return RedirectToAction("SelectedFlights");
+        }
+
+        [HttpPost]
+        public IActionResult ReserveFlight(int id)
+        {
+            var session = new FlightSessions(HttpContext.Session);
+            var cookies = new FlightCookies(Request.Cookies, Response.Cookies);
+
+            bool alreadyReserved = selectionRepo.List(
+                new QueryOptions<FlightSelection>())
+                .Any(r => r.FlightId == id);
+
+            if (!alreadyReserved)
+            {
+                selectionRepo.Insert(new FlightSelection
+                {
+                    FlightId = id
+                });
+
+                selectionRepo.Save();
+
+                TempData["Message"] = "Flight reserved successfully!";
+            }
+            else
+            {
+                TempData["Message"] = "This flight is already reserved.";
+            }
+
+            var selections = session.GetSelections();
+
+            var selected = selections.FirstOrDefault(s => s.FlightId == id);
+
+            if (selected != null)
+            {
+                selections.Remove(selected);
+                session.SetSelections(selections);
+                cookies.SetSelectedIds(selections);
+            }
+
+            return RedirectToAction("SelectedFlights");
         }
 
         [HttpGet]
@@ -70,20 +210,21 @@ namespace Group2Flight.Controllers
             var session = new FlightSessions(HttpContext.Session);
             var cookies = new FlightCookies(Request.Cookies, Response.Cookies);
 
-            var flightSelection = new FlightSelection
-            {
-                FlightId = id,
-            };
-
-            _ctx.FlightSelection.Add(flightSelection);
-            _ctx.SaveChanges();
-
             var selections = session.GetSelections();
-            selections.Add(flightSelection);
-            session.SetSelections(selections);
-            cookies.SetSelectedIds(selections);
 
-            TempData["Message"] = "Flight Confirmed!.";
+            if (!selections.Any(s => s.FlightId == id))
+            {
+                selections.Add(new FlightSelection
+                {
+                    FlightSelectionId = id,
+                    FlightId = id
+                });
+
+                session.SetSelections(selections);
+                cookies.SetSelectedIds(selections);
+            }
+
+            TempData["Message"] = "Flight Confirmed!";
 
             return RedirectToAction("Index", new
             {
@@ -99,17 +240,42 @@ namespace Group2Flight.Controllers
             var session = new FlightSessions(HttpContext.Session);
             var cookies = new FlightCookies(Request.Cookies, Response.Cookies);
 
-            var selectedIds = cookies.GetSelectedIds();
+            var selections = session.GetSelections();
 
-            var flightSelections = _ctx.FlightSelection
-                .Include(r => r.Flight)
-                    .ThenInclude(f => f.Airline)
-                .Where(r => selectedIds.Contains(r.FlightSelectionId.ToString()))
-                .ToList();
+            if (selections == null || !selections.Any())
+            {
+                var ids = cookies.GetSelectedIds();
+
+                if (ids.Length > 0)
+                {
+                    selections = ids.Select(id => new FlightSelection
+                    {
+                        FlightSelectionId = int.Parse(id),
+                        FlightId = int.Parse(id)
+                    }).ToList();
+
+                    session.SetSelections(selections);
+                }
+                else
+                {
+                    selections = new List<FlightSelection>();
+                }
+            }
+
+            foreach (var item in selections)
+            {
+                var options = new QueryOptions<Flight>
+                {
+                    Includes = "Airline",
+                    Where = f => f.FlightId == item.FlightId
+                };
+
+                item.Flight = flightRepo.Get(options);
+            }
 
             var model = new FlightsViewModel
             {
-                FlightSelection = flightSelections,
+                FlightSelection = selections,
                 ActiveFromKey = session.GetActiveFrom(),
                 ActiveToKey = session.GetActiveTo(),
                 ActiveDepartureDate = session.GetActiveDepartureDate(),
@@ -123,68 +289,58 @@ namespace Group2Flight.Controllers
         public IActionResult DeleteAllSelections()
         {
             var session = new FlightSessions(HttpContext.Session);
-            var selections = session.GetSelections();
+            var cookies = new FlightCookies(Request.Cookies, Response.Cookies);
 
-            if (selections != null && selections.Any())
-            {
-                var ids = selections.Select(r => r.FlightSelectionId).ToList();
+            session.RemoveSelections();
+            cookies.RemoveSelectedIds();
 
-                var flightSelections = _ctx.FlightSelection
-                    .Where(r => ids.Contains(r.FlightSelectionId))
-                    .ToList();
+            TempData["Message"] =
+                "All selected flights cancelled successfully!";
 
-                _ctx.FlightSelection.RemoveRange(flightSelections);
-                _ctx.SaveChanges();
-
-                session.RemoveSelections();
-
-                var cookies = new FlightCookies(Request.Cookies, Response.Cookies);
-                cookies.RemoveSelectedIds();
-            }
-
-            TempData["Message"] = "All selected flights cancelled successfully!";
             return RedirectToAction("SelectedFlights");
         }
-
 
         [HttpPost]
         public IActionResult CancelSelectedFlights(int id)
         {
             var session = new FlightSessions(HttpContext.Session);
-            var flightSelection = _ctx.FlightSelection.Find(id);
-            if (flightSelection != null)
-            {
-                _ctx.FlightSelection.Remove(flightSelection);
-                _ctx.SaveChanges();
-            }
+            var cookies = new FlightCookies(Request.Cookies, Response.Cookies);
 
             var selections = session.GetSelections();
-            var flight = selections.FirstOrDefault(r => r.FlightSelectionId == id);
-            if (flight != null)
+
+            var item = selections
+                .FirstOrDefault(s => s.FlightSelectionId == id);
+
+            if (item != null)
             {
-                selections.Remove(flight);
+                selections.Remove(item);
                 session.SetSelections(selections);
             }
 
-            var cookies = new FlightCookies(Request.Cookies, Response.Cookies);
             cookies.RemoveSelectedId(id);
 
-            TempData["Message"] = "Selected Flight cancelled successfully!";
+            TempData["Message"] =
+                "Selected Flight cancelled successfully!";
+
             return RedirectToAction("SelectedFlights");
         }
 
-
         public IActionResult Details(int id)
         {
-            var flight = _ctx.Flight
-                .Include(r => r.Airline)
-                .FirstOrDefault(r => r.FlightId == id);
+            var options = new QueryOptions<Flight>
+            {
+                Includes = "Airline",
+                Where = f => f.FlightId == id
+            };
+
+            var flight = flightRepo.Get(options);
+
             if (flight == null)
                 return NotFound();
 
             var session = new FlightSessions(HttpContext.Session);
 
-            var flightsViewModel = new FlightsViewModel
+            var model = new FlightsViewModel
             {
                 Flights = flight,
                 ActiveFromKey = session.GetActiveFrom(),
@@ -193,18 +349,24 @@ namespace Group2Flight.Controllers
                 ActiveCabinType = session.GetActiveCabinType()
             };
 
-            return View(flightsViewModel);
+            return View(model);
         }
 
         public IActionResult Privacy()
-		{
-			return View();
-		}
+        {
+            return View();
+        }
 
-		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-		public IActionResult Error()
-		{
-			return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-		}
-	}
+        [ResponseCache(Duration = 0,
+            Location = ResponseCacheLocation.None,
+            NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel
+            {
+                RequestId = Activity.Current?.Id ??
+                            HttpContext.TraceIdentifier
+            });
+        }
+    }
 }

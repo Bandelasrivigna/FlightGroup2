@@ -1,4 +1,5 @@
 using Group2Flight.Models;
+using Group2Flight.Models.DataLayer;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,6 +8,8 @@ builder.Services.AddMemoryCache();
 builder.Services.AddSession();
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+
 builder.Services.AddDbContext<Group2FlightDatabaseContext>(options =>
     options.UseSqlite(
         builder.Configuration.GetConnectionString("Group2FlightDatabaseConn")));

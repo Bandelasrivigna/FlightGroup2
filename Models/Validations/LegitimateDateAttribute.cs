@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.ComponentModel.DataAnnotations;
 
-namespace Group2Flight.Models
+namespace Group2Flight.Models.Validations
 {
     public class LegitimateDateAttribute : ValidationAttribute, IClientModelValidator
     {
@@ -20,7 +20,7 @@ namespace Group2Flight.Models
             DateTime today = DateTime.Today;
             DateTime maxDate = today.AddYears(_maxYears);
 
-            return (date > today && date <= maxDate)
+            return date > today && date <= maxDate
                 ? ValidationResult.Success
                 : GetValidationResult(context);
         }

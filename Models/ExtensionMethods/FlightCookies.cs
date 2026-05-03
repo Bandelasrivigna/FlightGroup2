@@ -1,4 +1,6 @@
-﻿namespace Group2Flight.Models
+﻿using Group2Flight.Models.DomainModels;
+
+namespace Group2Flight.Models.ExtensionMethods
 {
     public class FlightCookies
     {
@@ -41,7 +43,7 @@
         }
         public string[] GetSelectedIds()
         {
-            string cookie = requestCookies[SelectionKey] ?? String.Empty;
+            string cookie = requestCookies[SelectionKey] ?? string.Empty;
             if (string.IsNullOrEmpty(cookie))
                 return Array.Empty<string>();
             else

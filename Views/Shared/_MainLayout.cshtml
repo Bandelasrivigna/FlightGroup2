@@ -1,6 +1,6 @@
 ﻿@{
     Layout = "_Layout";
-    var session = new FlightSessions(Context.Session);
+    var session = new Group2Flight.Models.ExtensionMethods.FlightSessions(Context.Session);
     int? count = session.GetSelectedCount() ?? 0;
 }
 <header>

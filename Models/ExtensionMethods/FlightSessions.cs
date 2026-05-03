@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.Metrics;
+using Group2Flight.Models.DomainModels;
 
-namespace Group2Flight.Models
+namespace Group2Flight.Models.ExtensionMethods
 {
     public class FlightSessions
     {

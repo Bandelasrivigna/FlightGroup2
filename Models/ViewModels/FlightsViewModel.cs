@@ -1,4 +1,6 @@
-﻿namespace Group2Flight.Models
+﻿using Group2Flight.Models.DomainModels;
+
+namespace Group2Flight.Models.ViewModels
 {
     public class FlightsViewModel
     {

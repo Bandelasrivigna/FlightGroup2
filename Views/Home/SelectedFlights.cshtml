@@ -1,4 +1,4 @@
-﻿@model Group2Flight.Models.FlightsViewModel
+﻿@model Group2Flight.Models.ViewModels.FlightsViewModel
 @{
     ViewData["Title"] = "My Flights";
 }
@@ -49,6 +49,10 @@
                                 <input type="hidden" name="id" value="@flightSel.FlightSelectionId" />
                                 <button type="submit" class="gf-btn-cancel">✕ Cancel</button>
                             </form>
+                            <form asp-action="ReserveFlight" method="post">
+                                <input type="hidden" name="id" value="@flightSel.FlightSelectionId" />
+                                <button type="submit" class="gf-btn-cancel">Reserve</button>
+                            </form>
                         </div>
                     </div>
                 }
@@ -66,6 +70,10 @@
         <div class="gf-bottom-bar">
             <form asp-action="DeleteAllSelections" method="post">
                 <button type="submit" class="gf-btn-delete">⊗ Delete All</button>
+            </form>
+            
+            <form asp-action="ReserveAllFlights" method="post">
+                <button type="submit" class="gf-btn-delete">⊗ Reserve All</button>
             </form>
 
             <a asp-action="Index"

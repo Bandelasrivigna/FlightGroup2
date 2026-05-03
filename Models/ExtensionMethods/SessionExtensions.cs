@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace Group2Flight.Models
+namespace Group2Flight.Models.ExtensionMethods
 {
     public static class SessionExtensions
     {
@@ -15,10 +15,10 @@ namespace Group2Flight.Models
             var json = session.GetString(key);
             if (string.IsNullOrEmpty(json))
             {
-                return default(T);
+                return default;
             }
-            else 
-            { 
+            else
+            {
                 return JsonSerializer.Deserialize<T>(json);
             }
         }

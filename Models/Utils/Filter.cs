@@ -1,4 +1,4 @@
-﻿namespace Group2Flight.Models
+﻿namespace Group2Flight.Models.Utils
 {
     public class Filter
     {

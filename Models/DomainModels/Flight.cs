@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.ComponentModel.DataAnnotations;
+using Group2Flight.Models.Validations;
 
-namespace Group2Flight.Models
+namespace Group2Flight.Models.DomainModels
 {
     public class Flight
     {
@@ -24,7 +25,7 @@ namespace Group2Flight.Models
 
         [Required(ErrorMessage = "Please enter a Date.")]
         [LegitimateDate(3, ErrorMessage = "The date should be valid, subsequent to today and within three years.")]
-        [Remote(action: "CheckFlight", controller: "Validation", areaName: "",AdditionalFields = nameof(FlightCode),ErrorMessage = "A flight for this date already exists.")]
+        [Remote(action: "CheckFlight", controller: "Validation", areaName: "", AdditionalFields = nameof(FlightCode), ErrorMessage = "A flight for this date already exists.")]
         public DateTime Date { get; set; }
 
         [Required(ErrorMessage = "Please enter a DepartureTime.")]
