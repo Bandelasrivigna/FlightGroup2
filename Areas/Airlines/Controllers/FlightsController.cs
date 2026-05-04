@@ -12,11 +12,14 @@ namespace Group2Flight.Areas.Airlines.Controllers
         private IRepository<Flight> flightData { get; set; }
         private IRepository<Airline> airlineData { get; set; }
 
+        private IRepository<FlightSelection> flightSelectionData { get; set; }
+
         public FlightsController(IRepository<Flight> flightRepo,
-                                 IRepository<Airline> airlineRepo)
+                                 IRepository<Airline> airlineRepo, IRepository<FlightSelection> flightselectionRepo)
         {
             flightData = flightRepo;
             airlineData = airlineRepo;
+            flightSelectionData = flightselectionRepo;
         }
 
         [HttpGet]
@@ -82,12 +85,31 @@ namespace Group2Flight.Areas.Airlines.Controllers
         public IActionResult Delete(int id)
         {
             var flight = flightData.Get(id);
+
+            var isReserved = flightSelectionData.List(new QueryOptions<FlightSelection>())
+                .Any(r => r.FlightId == id);
+
+            if (isReserved)
+            {
+                TempData["Message"] = "Cannot delete this flight. It has existing reservations.";
+                return RedirectToAction("Index");
+            }
+
             return View(flight);
         }
 
         [HttpPost]
         public IActionResult Delete(Flight flight)
         {
+            var isReserved = flightSelectionData.List(new QueryOptions<FlightSelection>())
+                .Any(r => r.FlightId == flight.FlightId);
+
+            if (isReserved)
+            {
+                TempData["Message"] = "Cannot delete this flight because it has active reservations.";
+                return RedirectToAction("Index");
+            }
+
             flightData.Delete(flight);
             flightData.Save();
 
